@@ -1,5 +1,8 @@
 package com.todoapp.todo.jwt;
 
+import com.todoapp.todo.entity.User;
+import com.todoapp.todo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +16,8 @@ import java.util.Optional;
 public class JwtInMemoryUserDetailsService implements UserDetailsService {
 
   static List<JwtUserDetails> inMemoryUserList = new ArrayList<>();
+  @Autowired
+  private UserRepository userRepository;
 
   static {
     inMemoryUserList.add(new JwtUserDetails(1L, "in28minutes",
@@ -23,14 +28,12 @@ public class JwtInMemoryUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<JwtUserDetails> findFirst = inMemoryUserList.stream()
-        .filter(user -> user.getUsername().equals(username)).findFirst();
+    Optional<User> userOpt = userRepository.findByUserName(username);
 
-    if (!findFirst.isPresent()) {
-      throw new UsernameNotFoundException(String.format("USER_NOT_FOUND '%s'.", username));
-    }
+    if(!userOpt.isPresent()) throw new UsernameNotFoundException(String.format("USER_NOT_FOUND '%s'.", username));
+    User user = userOpt.get();
 
-    return findFirst.get();
+    return new JwtUserDetails(1L,user.getUserName(),user.getPassword(),"ROLE");
   }
 
 }

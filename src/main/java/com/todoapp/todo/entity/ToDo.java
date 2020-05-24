@@ -1,5 +1,6 @@
-package com.todoapp.todo.dto;
+package com.todoapp.todo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
@@ -15,34 +15,23 @@ import java.util.Objects;
 @AllArgsConstructor
 @Entity
 @Table(name="Todo")
-public class ToDoDTO {
+public class ToDo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
-    @Column(name="user_name")
-    private String userName;
     @Column(name="description")
     private String description;
     @Column(name="status")
     private boolean status;
     @Column(name="target_date")
     private Date targetDate;
+    @JsonIgnore
+    @ManyToOne()
+    @JoinColumn(name = "todo_user_id",referencedColumnName = "id",nullable = false)
+    private User user;
 
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ToDoDTO toDoDTO = (ToDoDTO) o;
-        return id.equals(toDoDTO.id) &&
-                userName.equals(toDoDTO.userName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, userName);
-    }
 }

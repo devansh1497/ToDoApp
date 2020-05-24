@@ -1,7 +1,8 @@
 package com.todoapp.todo.controller;
 
-import com.todoapp.todo.dto.ToDoDTO;
+import com.todoapp.todo.entity.ToDo;
 import com.todoapp.todo.repository.TodoRepository;
+import com.todoapp.todo.repository.UserRepository;
 import com.todoapp.todo.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,32 +21,39 @@ public class TodoJpaController {
     @Autowired
     private TodoRepository todoRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     //All todos for a user
     @GetMapping("/{userName}")
     ResponseEntity<?> findAllTodos(@PathVariable String userName){
-        List<ToDoDTO> toDoDTOs = todoService.findAllTodos(userName);
-        return ResponseEntity.ok().body(toDoDTOs);
+        try {
+            List<ToDo> toDos = todoService.findAllTodos(userName);
+            return ResponseEntity.ok().body(toDos);
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
 //    Get to do by username and id for the update page
     @GetMapping("{userName}/{id}/update")
     ResponseEntity<?> findTodoById(@PathVariable String userName, @PathVariable Long id){
-        ToDoDTO todo = todoService.findByIdAndUserName(id, userName);
+        ToDo todo = todoService.findById(id);
         if(todo == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok().body(todo);
     }
 
 //    //Update existing to do
     @PostMapping("{userName}/{id}/update")
-    ResponseEntity<?> updateTodoById(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDoDTO toDoDTO){
-        ToDoDTO todo = todoService.updateById(userName,id,toDoDTO);
+    ResponseEntity<?> updateTodoById(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDo toDo){
+        ToDo todo = todoService.updateById(userName,id, toDo);
         if(todo == null) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok().body(toDoDTO);
+        return ResponseEntity.ok().body(toDo);
     }
 
     @DeleteMapping("{userName}/{id}/delete")
     ResponseEntity<?> deleteById(@PathVariable String userName, @PathVariable Long id){
-        ToDoDTO todo = todoService.deleteById(id);
+        ToDo todo = todoService.deleteById(id);
         if(todo == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.noContent().build();
     }

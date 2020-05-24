@@ -1,7 +1,8 @@
 package com.todoapp.todo.controller;
 
-import com.todoapp.todo.dto.ToDoDTO;
+import com.todoapp.todo.entity.ToDo;
 import com.todoapp.todo.service.TodoService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,37 +21,37 @@ import java.util.List;
 
     @DeleteMapping("/{userName}/{todoId}/delete")
     public ResponseEntity<String> deleteById(@PathVariable String userName, @PathVariable Long todoId){
-        ToDoDTO todo =  todoService.deleteById(todoId);
+        ToDo todo =  todoService.deleteById(todoId);
         if(todo == null) return ResponseEntity.notFound().build();
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{userName}/{id}/update")
-    public ToDoDTO updateByid(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDoDTO todoDTO){
-        return todoService.updateById(userName, id, todoDTO);
+    public ToDo updateByid(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDo todo){
+        return todoService.updateById(userName, id, todo);
     }
 
     @GetMapping("/{userName}")
-    public List<ToDoDTO> findTodoByUser(@PathVariable String userName){
+    public List<ToDo> findTodoByUser(@PathVariable String userName) throws NotFoundException {
         return todoService.findAllTodos(userName);
     }
 
     @GetMapping("/{userName}/{id}/todo")
-    public ToDoDTO findTodoById(@PathVariable String userName, @PathVariable Long id){
+    public ToDo findTodoById(@PathVariable String userName, @PathVariable Long id){
 
         return todoService.findTodoById(userName,id);
 
     }
 
     @PutMapping("/users/{userName}/todos/{id}")
-    public ResponseEntity<ToDoDTO> updateToDo(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDoDTO todo){
-        ToDoDTO to = todoService.save(todo);
-        return new ResponseEntity<ToDoDTO>(to, HttpStatus.OK);
+    public ResponseEntity<ToDo> updateToDo(@PathVariable String userName, @PathVariable Long id, @RequestBody ToDo todo){
+        ToDo to = todoService.save(todo);
+        return new ResponseEntity<ToDo>(to, HttpStatus.OK);
     }
 
     @PostMapping("/users/{userName}")
-    public ResponseEntity<ToDoDTO> addTodo(@PathVariable String userName, @RequestBody ToDoDTO todo){
-        ToDoDTO to = todoService.save(todo);
+    public ResponseEntity<ToDo> addTodo(@PathVariable String userName, @RequestBody ToDo todo){
+        ToDo to = todoService.save(todo);
         return new ResponseEntity<>(to,HttpStatus.CREATED);
     }
 
